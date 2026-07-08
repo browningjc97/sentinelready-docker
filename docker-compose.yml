@@ -1,0 +1,46 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: sentinelready-ollama
+    volumes:
+      - ollama_models:/root/.ollama
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  # One-shot: pulls the model on first run so the README's "just works" claim
+  # is actually true, instead of the first alert silently hanging for 2
+  # minutes (the resilience call_timeout) and falling back to a raw alert.
+  ollama-pull:
+    image: ollama/ollama:latest
+    container_name: sentinelready-ollama-pull
+    depends_on:
+      ollama:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c", "OLLAMA_HOST=http://ollama:11434 ollama pull llama3.1"]
+    restart: "no"
+
+  sentinelready:
+    image: ghcr.io/browningjc97/sentinelready-docker:latest
+    container_name: sentinelready
+    ports:
+      - "8000:8000"
+    volumes:
+      - sentinel_data:/app/scripts/data
+      - ./sentinelready.yaml:/app/sentinelready.yaml:ro
+    environment:
+      - SENTINEL_CONFIG=/app/sentinelready.yaml
+    depends_on:
+      ollama:
+        condition: service_healthy
+      ollama-pull:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+volumes:
+  sentinel_data:
+  ollama_models:

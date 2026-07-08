@@ -1,0 +1,3 @@
+# Real config — contains your webhook secret and license key, never commit
+sentinelready.yaml
+.env

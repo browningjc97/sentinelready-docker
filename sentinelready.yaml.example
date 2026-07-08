@@ -1,0 +1,100 @@
+# ─────────────────────────────────────────────────────────────
+# SentinelReady Configuration
+# Copy this file to sentinelready.yaml and edit for your environment
+# ─────────────────────────────────────────────────────────────
+
+# ── AI PROVIDER ───────────────────────────────────────────────
+ai:
+  # Ships with Ollama by default (free, runs locally, works out of the
+  # box). You can point this at Claude or any OpenAI-compatible API
+  # instead (OpenAI, Azure OpenAI, Groq, Together.ai, OpenRouter, local
+  # vLLM/LM Studio) in either edition — you bring your own API key and
+  # that provider bills you directly; SentinelReady never sees or proxies
+  # the cost. This setting isn't license-gated.
+  enabled: true
+  provider: ollama               # ollama | claude | openai_compatible
+  model: llama3.1                # Ollama model to use
+  ollama_host: http://ollama:11434  # Internal compose service — do not change
+
+  # ── openai_compatible only — ignored for ollama/claude ──
+  # base_url: https://api.openai.com/v1        # or Groq/Together/OpenRouter/vLLM/etc.
+  # model: gpt-4o-mini                          # overrides the Ollama model line above
+  # auth_header_style: bearer                   # bearer (most providers) | api-key (Azure OpenAI)
+  # api_version: ""                             # Azure only, e.g. 2024-10-21
+  # API key is never stored here — set SENTINEL_AI_API_KEY as an env var
+  # (same treatment as ANTHROPIC_API_KEY for Claude).
+
+# ── CUSTOMER ──────────────────────────────────────────────────
+customer:
+  # Your team or company name — used to tag all alerts and patterns
+  default_code: myteam
+
+  # Used to authenticate incoming webhook calls — must match the secret
+  # you configure in your alerting tool (Grafana, CloudWatch, Datadog,
+  # Slack, UDM, or generic). Leave as-is if you want: SentinelReady will
+  # auto-generate a real secret on first run and print it to the logs
+  # (`docker compose logs sentinelready`) along with setup instructions.
+  # Set your own value here instead if you'd rather choose it yourself.
+  webhook_secret: change-me-please
+
+# ── DELIVERY ──────────────────────────────────────────────────
+delivery:
+  # local = log only (default, good for getting started)
+  # smtp  = send email (configure smtp section below)
+  mode: local
+
+  # Who gets paged — add real email addresses
+  routes:
+    sre:  ["you@yourcompany.com"]
+    ops:  ["you@yourcompany.com"]
+    all:  ["you@yourcompany.com", "oncall@yourcompany.com"]
+
+  # SMTP settings (only needed if mode: smtp)
+  smtp:
+    host: null           # e.g. smtp.gmail.com
+    port: 587
+    username: null
+    password: null
+    use_tls: true
+    from_addr: sentinelready@yourcompany.com
+
+# ── DATA PATHS ────────────────────────────────────────────────
+history:
+  # Leave these as-is — data directory is mounted as a Docker volume
+  db_path: /app/scripts/data/sentinel_history.db
+  events_file: /app/scripts/data/events.jsonl
+
+fingerprint:
+  db_path: /app/scripts/data/sentinel_fingerprints.db
+  cache_enabled: true
+  min_confidence: 0.7
+
+# ── LICENSE ───────────────────────────────────────────────────
+license:
+  # Community edition limits — do not modify
+  # Upgrade to Pro at sentinelready.io/upgrade
+  tier: community
+  max_patterns: 50
+  max_ssl_domains: 1
+  max_users: 1
+  weekly_digest: false
+  mobile_push: false
+  # Outcome learning and pattern sequences are free in both Community and
+  # Pro — not license-gated. Set to false yourself if you'd rather
+  # SentinelReady not track alert outcomes at all.
+  outcome_learning: true
+  pattern_sequences: true
+
+# ── KUBERNETES (optional) ─────────────────────────────────────
+kubernetes:
+  # Enable if SentinelReady can reach your cluster API
+  # Not required — log snippets will fall back to local files
+  enabled: false
+  log_lines: 50
+  namespace: default
+
+# ── LOGS ─────────────────────────────────────────────────────
+logs:
+  snippet_paths:
+    - /app/sentinel.log
+  snippet_limit: 20
