@@ -82,6 +82,18 @@ You should see something like:
 
 Set the webhook secret header: `x-sentinel-secret: your-secret-from-yaml`
 
+**No configuration needed for source/instance tracking.** When a flood of
+similar alerts gets collapsed into one summary, SentinelReady reports
+whether it was really one host repeating vs. many different hosts
+failing independently — automatically, using whatever instance/host/pod
+field your monitoring tool already includes natively (Grafana's
+`instance`/`pod`/`node` labels, Datadog's `host` field, etc.). Nothing to
+set up — if your alert source includes it, it's used; if it doesn't, the
+summary just says "source unknown" and everything else works exactly the
+same. For the generic webhook specifically, you can optionally include
+an `instance` or `host` field in your payload if you want this detail
+for custom integrations — still entirely optional.
+
 ---
 
 ## Send a Test Alert
