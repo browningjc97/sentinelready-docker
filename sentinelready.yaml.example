@@ -69,6 +69,16 @@ fingerprint:
   cache_enabled: true
   min_confidence: 0.7
 
+# ── ALERTING ──────────────────────────────────────────────────
+alerting:
+  # Severities listed here always page — never suppressed, never
+  # downgraded, never flood-aggregated, regardless of learned-pattern
+  # confidence or AI judgment. Not license-gated, free in both editions.
+  # Matches the incoming alert's own "severity" field. Empty by default —
+  # you decide what's sacred in your environment.
+  sacred_severities: []
+  # Example: sacred_severities: [critical, high]
+
 # ── LICENSE ───────────────────────────────────────────────────
 license:
   # Community edition limits — do not modify
