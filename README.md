@@ -158,6 +158,27 @@ silence. You'll never lose an alert to an internal hiccup.
 
 ---
 
+## Known Gotchas
+
+### Ollama on a separate host
+
+If running Ollama on a different host from SentinelReady (not via the
+docker-compose sidecar), Ollama binds to localhost by default and
+SentinelReady cannot reach it.
+
+Fix — add to Ollama's systemd service:
+
+```
+Environment="OLLAMA_HOST=0.0.0.0"
+```
+
+Then: `systemctl daemon-reload && systemctl restart ollama`
+
+This is not needed when using the standard `docker-compose.yml` — both
+containers share an internal Docker network automatically.
+
+---
+
 ## Activating Pro
 
 If you've purchased Pro, you'll receive a license key. Set it in your
