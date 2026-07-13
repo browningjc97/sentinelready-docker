@@ -24,6 +24,18 @@ ai:
   # API key is never stored here — set SENTINEL_AI_API_KEY as an env var
   # (same treatment as ANTHROPIC_API_KEY for Claude).
 
+  # ── Cost Management (Claude / OpenAI-compatible only) ──
+  # SR processes every alert — a noisy environment can generate
+  # significant API calls in the first few weeks before pattern
+  # recognition reduces them. Set a monthly spending limit before
+  # connecting SR to production alert traffic:
+  #   Claude API: $20/mo at console.anthropic.com -> Settings -> Billing
+  #     -> Monthly spend limit
+  #   OpenAI API: $20/mo at platform.openai.com -> Settings -> Billing
+  #     -> Usage limits
+  # SR gets cheaper over time as pattern recognition eliminates repeat
+  # AI calls — most customers see 80% cost reduction within 90 days.
+
 # ── CUSTOMER ──────────────────────────────────────────────────
 customer:
   # Your team or company name — used to tag all alerts and patterns
