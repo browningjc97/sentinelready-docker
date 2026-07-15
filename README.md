@@ -2,9 +2,11 @@
 
 **Your Virtual SRO. Always Watching. Never Surprised.**
 
-SentinelReady sits between your alerting tools and your on-call rotation.
-It triages every alert with AI, recognizes patterns it's seen before,
-and only wakes you up when it actually matters.
+SentinelReady sits between your monitoring tools and your team. Your
+monitoring tools keep doing what they do — SR makes sure the right
+signals reach the right people. It triages every alert with AI,
+recognizes patterns it's seen before, and only wakes you up when it
+actually matters.
 
 ---
 
