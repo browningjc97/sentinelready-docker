@@ -142,7 +142,7 @@ silence. You'll never lose an alert to an internal hiccup.
 - Environment context rules — tell SentinelReady what's normal
 - Causal correlation — detects node failure cascades and memory patterns
 - Outcome learning — free in both Community and Pro
-- Paging decision engine — escalate, sitrep, or suppress
+- Escalation decision engine — escalate, sitrep, or suppress
 - Read-only status page: `GET /status`
 - Pattern stats: `GET /patterns/stats`
 
