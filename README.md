@@ -134,6 +134,45 @@ silence. You'll never lose an alert to an internal hiccup.
 
 ---
 
+## Sitreps — a periodic digest of everything SentinelReady saw
+
+Instead of (or alongside) real-time escalations, SentinelReady can send
+you a digest — how many alerts came in, what got escalated, what
+patterns it's learned, what's worth a permanent fix rather than repeated
+manual triage.
+
+Off by default. Turn it on in `sentinelready.yaml`:
+
+```yaml
+sitrep:
+  enabled: true
+  cadence: daily          # daily | weekly | monthly
+  recipients:
+    - "you@yourcompany.com"
+```
+
+Once enabled, SentinelReady schedules and sends these itself — no
+external cron needed, nothing else to set up. It checks every 15 minutes
+whether the configured cadence is due and sends when it is.
+
+Want a second digest at a different cadence — e.g. a high-level weekly
+summary for a manager alongside your own daily one — the `summary:`
+section works the same way, independently:
+
+```yaml
+summary:
+  enabled: true
+  cadence: weekly
+  recipients:
+    - "manager@yourcompany.com"
+```
+
+Community edition includes 5 free sitrep sends (lifetime, per team);
+after that, `/sitrep/send` returns a preview only until you upgrade to
+Pro for unlimited sitreps.
+
+---
+
 ## What's Included
 
 - Webhook receiver: Grafana, DataDog, CloudWatch, Slack, UDM, Generic
@@ -151,7 +190,6 @@ silence. You'll never lose an alert to an internal hiccup.
 ## Known Limitations (Current Release)
 
 - Mobile push notifications — Pro feature, coming soon
-- Weekly behavior digest — Pro feature, coming soon
 - SSL certificate monitoring — coming soon
 - Web dashboard — coming after Pro launch
 - SMTP delivery defaults to local logging — configure smtp section in yaml to enable email

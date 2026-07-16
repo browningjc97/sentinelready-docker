@@ -70,6 +70,26 @@ delivery:
     use_tls: true
     from_addr: sentinelready@yourcompany.com
 
+# ── SITREP / SUMMARY DELIVERY ─────────────────────────────────
+# SentinelReady can send you a periodic digest (a "sitrep") of everything
+# it's seen and done — off by default until you set real recipients here.
+# Once enabled, SentinelReady schedules and sends these itself on the
+# cadence below (built-in scheduler, checks every 15 min) — nothing else
+# to set up, no external cron needed.
+sitrep:
+  enabled: false
+  cadence: daily        # daily | weekly | monthly
+  recipients: []         # e.g. ["you@yourcompany.com"]
+
+# Optional second digest at a different cadence — e.g. a high-level
+# weekly summary for management alongside a daily operational sitrep.
+# Independent of the sitrep section above; leave disabled if you only
+# want one.
+summary:
+  enabled: false
+  cadence: weekly        # daily | weekly | monthly
+  recipients: []
+
 # ── DATA PATHS ────────────────────────────────────────────────
 history:
   # Leave these as-is — data directory is mounted as a Docker volume
