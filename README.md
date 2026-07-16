@@ -179,6 +179,31 @@ Then: `systemctl daemon-reload && systemctl restart ollama`
 This is not needed when using the standard `docker-compose.yml` — both
 containers share an internal Docker network automatically.
 
+### Firewall / network exposure
+
+SentinelReady is designed to sit behind your own firewall, reachable only
+by the monitoring tools you point at it — not exposed directly to the
+public internet.
+
+- **Port 8000 (SentinelReady itself)** — needs to be reachable by whatever
+  is sending it webhooks (Grafana, DataDog, CloudWatch, your alerting
+  tool). It does **not** need to be reachable from the public internet.
+  The webhook secret (`x-sentinel-secret` header) and per-client rate
+  limiting both help if it's ever exposed anyway, but neither is a
+  substitute for keeping it on a private network.
+- **Port 11434 (Ollama)** — should **never** be exposed beyond your
+  internal network. It has no authentication of its own; anyone who can
+  reach it can run inference on your GPU/CPU for free. Only needs to be
+  reachable by the SentinelReady container itself (automatic on the
+  standard `docker-compose.yml`'s internal network).
+- **Outbound only**: SMTP (if `delivery.mode: smtp`), and the AI provider's
+  API (Claude/OpenAI, if configured) — no inbound firewall rule needed for
+  either.
+
+If you do need SentinelReady reachable from outside your network (e.g. a
+cloud-hosted alerting tool that can't reach your internal IPs), put it
+behind a reverse proxy or VPN rather than exposing port 8000 directly.
+
 ---
 
 ## Activating Pro
