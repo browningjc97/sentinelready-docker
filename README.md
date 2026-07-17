@@ -98,6 +98,12 @@ for custom integrations — still entirely optional.
 
 ---
 
+Running SentinelReady across multiple client sites on one instance
+(MSP tiers)? See [`MSP-SETUP.md`](MSP-SETUP.md) — single-site
+Community/Pro customers can skip this entirely.
+
+---
+
 ## Send a Test Alert
 
 ```bash
