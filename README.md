@@ -220,7 +220,46 @@ A couple of things worth knowing before you rely on it:
 
 ---
 
+## SMS Delivery
+
+**Community/Pro — carrier email-to-text (at your own risk).** Critical
+alerts can reach a phone as a text message with zero extra
+infrastructure: put your carrier's email-to-SMS gateway address in
+`delivery.routes` instead of (or alongside) a real email address —
+SentinelReady just sends it as a plain-text email, same `smtp` config
+as everything else above.
+
+| Carrier | Gateway |
+|---|---|
+| AT&T | `number@txt.att.net` |
+| T-Mobile | `number@tmomail.net` |
+| Verizon | `number@vtext.com` |
+| Sprint | `number@messaging.sprintpcs.com` |
+| US Cellular | `number@email.uscc.net` |
+| Boost | `number@sms.myboostmobile.com` |
+| Cricket | `number@sms.cricketwireless.net` |
+| Metro PCS | `number@mymetropcs.com` |
+| Google Fi | `number@msg.fi.google.com` |
+
+"At your own risk" because this depends entirely on the carrier's own
+gateway — no delivery guarantee, no read receipt, and carriers have
+been known to rate-limit or block gateway traffic that looks
+automated. It works, but it's not a substitute for a real SMS provider
+if reliability matters to you.
+
+**For guaranteed delivery**, point an [outbound webhook](#outbound-webhooks)
+at your own Twilio-connected integration (Zapier, a PagerDuty/Opsgenie
+routing rule, etc.) — SentinelReady doesn't have a native Twilio
+integration today, and never hosts or pays for SMS delivery itself.
+The carrier gateway above is the only SMS path SentinelReady sends
+directly.
+
+---
+
 ## Outbound Webhooks
+
+SR works with your existing incident management tools — it makes what
+they receive smarter, not replace them.
 
 SentinelReady never integrates with individual tool APIs — one
 standard JSON payload, infinite integrations. Configure a list of URLs

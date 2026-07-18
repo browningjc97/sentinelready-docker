@@ -55,7 +55,10 @@ delivery:
   # smtp  = send email (configure smtp section below)
   mode: local
 
-  # Who gets paged — add real email addresses
+  # Who gets paged — add real email addresses. A carrier email-to-SMS
+  # gateway address (e.g. number@tmomail.net) works here too -- it's
+  # still just an email address as far as SentinelReady is concerned.
+  # Full carrier gateway table in README.md under "SMS Delivery".
   routes:
     sre:  ["you@yourcompany.com"]
     ops:  ["you@yourcompany.com"]
