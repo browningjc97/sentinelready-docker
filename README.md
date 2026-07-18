@@ -220,6 +220,45 @@ A couple of things worth knowing before you rely on it:
 
 ---
 
+## Outbound Webhooks
+
+SentinelReady never integrates with individual tool APIs — one
+standard JSON payload, infinite integrations. Configure a list of URLs
+per tier (`critical`, `high`, `sitrep`) in `sentinelready.yaml` and
+SentinelReady fires its own triage payload at each one:
+
+```yaml
+delivery:
+  webhooks:
+    critical:
+      - type: pagerduty
+        url: https://events.pagerduty.com/v2/enqueue
+        routing_key: your-pagerduty-integration-key
+      - type: slack
+        url: https://hooks.slack.com/services/T000/B000/XXXXXXXX
+    high:
+      - type: slack
+        url: https://hooks.slack.com/services/T000/B000/XXXXXXXX
+    sitrep:
+      - type: generic
+        url: https://your-endpoint.example.com/ingest
+```
+
+`critical`/`high` fire per alert, in real time — the same moment as
+any SMS/push escalation. `sitrep` fires once per digest, alongside the
+sitrep email.
+
+- **`type: pagerduty`** — native PagerDuty Events API v2 format.
+- **`type: slack`** — native Slack incoming-webhook format.
+- **`type: generic`** (or omit `type`) — SentinelReady's own plain
+  JSON (the alert + AI triage brief, or the full sitrep report) —
+  point this at anything that accepts a JSON POST.
+
+This also works per-site if you're running MSP tiers — see
+[`MSP-SETUP.md`](MSP-SETUP.md).
+
+---
+
 ## What's Included
 
 - Webhook receiver: Grafana, DataDog, CloudWatch, Slack, UDM, Generic

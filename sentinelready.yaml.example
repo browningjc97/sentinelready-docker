@@ -70,6 +70,46 @@ delivery:
     use_tls: true
     from_addr: sentinelready@yourcompany.com
 
+  # Outbound webhooks (optional) — SentinelReady fires its own triage
+  # payload at these URLs, one list per tier. "critical"/"high" fire per
+  # alert, in real time, same moment as any SMS/push escalation. "sitrep"
+  # fires once per digest, alongside the sitrep email. Leave empty (the
+  # default) to skip this entirely — nothing here is required.
+  #
+  # type: pagerduty — sends PagerDuty Events API v2 format. Get
+  #   routing_key from your PagerDuty service's integration settings.
+  # type: slack — sends Slack's incoming-webhook format (a plain URL from
+  #   Slack's "Incoming Webhooks" app).
+  # type: generic (or omit type) — SentinelReady's own plain JSON
+  #   (alert + brief for critical/high, the full sitrep report for
+  #   sitrep) — point this at anything that accepts a JSON POST.
+  # headers: optional custom headers on any entry (e.g. an Authorization
+  #   bearer token your own endpoint requires).
+  webhooks:
+    critical: []
+    high: []
+    sitrep: []
+    # Example:
+    # critical:
+    #   - type: pagerduty
+    #     url: https://events.pagerduty.com/v2/enqueue
+    #     routing_key: your-pagerduty-integration-key
+    #   - type: slack
+    #     url: https://hooks.slack.com/services/T000/B000/XXXXXXXX
+    # high:
+    #   - type: slack
+    #     url: https://hooks.slack.com/services/T000/B000/XXXXXXXX
+    # sitrep:
+    #   - type: generic
+    #     url: https://your-endpoint.example.com/ingest
+    #     headers:
+    #       Authorization: "Bearer your-token"
+
+  # This whole webhooks section is also settable per customer_code via
+  # POST /delivery/policy (same endpoint routes/sitrep/summary already
+  # use) — see MSP-SETUP.md if running one instance across multiple
+  # client sites and each site needs its own webhook targets.
+
 # ── SITREP / SUMMARY DELIVERY ─────────────────────────────────
 # SentinelReady can send you a periodic digest (a "sitrep") of everything
 # it's seen and done — off by default until you set real recipients here.
