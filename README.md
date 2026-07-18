@@ -80,6 +80,9 @@ You should see something like:
 | Grafana | `http://your-host:8000/webhook/grafana` |
 | DataDog | `http://your-host:8000/webhook/datadog` |
 | CloudWatch | `http://your-host:8000/webhook/cloudwatch` |
+| Slack | `http://your-host:8000/webhook/slack` |
+| UDM | `http://your-host:8000/webhook/udm` |
+| UniFi Protect | `http://your-host:8000/webhook/unifi-protect` |
 | Generic | `http://your-host:8000/webhook/generic` |
 
 Set the webhook secret header: `x-sentinel-secret: your-secret-from-yaml`
