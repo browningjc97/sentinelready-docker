@@ -182,6 +182,44 @@ Pro for unlimited sitreps.
 
 ---
 
+## Email Delivery
+
+SentinelReady sends email over plain SMTP — no proprietary API, no
+lock-in to a specific provider. Point it at whatever mail relay you
+already use:
+
+```yaml
+delivery:
+  mode: smtp
+  smtp:
+    host: smtp.yourprovider.com
+    port: 587
+    username: your-username
+    password: your-password
+    use_tls: true
+    from_addr: sentinelready@yourcompany.com
+```
+
+Works with Gmail, Office 365, a self-hosted mail server, or any
+transactional email provider that hands out SMTP credentials (Resend,
+SendGrid, Mailgun, Amazon SES, etc.) — SentinelReady doesn't know or
+care which one you use.
+
+A couple of things worth knowing before you rely on it:
+
+- **Deliverability is on your mail provider, not SentinelReady.** A
+  "sent" status only means SMTP accepted the handoff — actual delivery
+  to an inbox (or a carrier's email-to-SMS gateway) depends on your
+  provider's own sender reputation, SPF/DKIM, and (for self-hosted
+  relays) a valid PTR record. If alerts aren't arriving, check your
+  mail server's own logs, not just SentinelReady's.
+- **`mode: local`** (the default) logs email content instead of
+  sending it — useful for testing without touching a real mail
+  provider, but nothing actually reaches anyone until you switch to
+  `mode: smtp`.
+
+---
+
 ## What's Included
 
 - Webhook receiver: Grafana, DataDog, CloudWatch, Slack, UDM, Generic
