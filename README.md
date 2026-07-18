@@ -101,9 +101,9 @@ for custom integrations — still entirely optional.
 
 ---
 
-Running SentinelReady across multiple client sites on one instance
-(MSP tiers)? See [`MSP-SETUP.md`](MSP-SETUP.md) — single-site
-Community/Pro customers can skip this entirely.
+Running SentinelReady across multiple sites on one instance
+(Multi-Site tiers)? See [`MULTI-SITE-SETUP.md`](MULTI-SITE-SETUP.md) —
+single-site Community/Pro customers can skip this entirely.
 
 ---
 
@@ -293,8 +293,8 @@ sitrep email.
   JSON (the alert + AI triage brief, or the full sitrep report) —
   point this at anything that accepts a JSON POST.
 
-This also works per-site if you're running MSP tiers — see
-[`MSP-SETUP.md`](MSP-SETUP.md).
+This also works per-site if you're running Multi-Site tiers — see
+[`MULTI-SITE-SETUP.md`](MULTI-SITE-SETUP.md).
 
 ---
 

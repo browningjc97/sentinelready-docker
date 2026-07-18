@@ -1,9 +1,13 @@
-# Multi-Site / MSP Setup
+# Multi-Site Setup
 
 This file only applies if you're running one SentinelReady instance
-across multiple client sites (MSP tiers). Single-site Community/Pro
+across multiple sites (Multi-Site tiers). Single-site Community/Pro
 customers never need this — everything here is additional setup on top
 of the main `README.md`, not a replacement for it.
+
+For MSPs and multi-location organizations — retail chains, healthcare
+networks, manufacturing plants, franchises, universities, enterprise
+divisions.
 
 Each site's alerts and sitreps need to reach only that site's own team,
 never mixed together. This is built entirely on `customer_code` — a
@@ -22,8 +26,8 @@ Every webhook checks, in order:
 
 CloudWatch alarms already include your AWS account ID in the payload
 (`account` via EventBridge, `AWSAccountId` via the older SNS-forwarding
-format) — SentinelReady picks this up automatically. If each client site
-is its own AWS account, CloudWatch multi-site just works with zero
+format) — SentinelReady picks this up automatically. If each site is its
+own AWS account, CloudWatch multi-site just works with zero
 configuration.
 
 ## Grafana / Datadog — one custom header per site

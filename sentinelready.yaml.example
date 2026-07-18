@@ -110,8 +110,8 @@ delivery:
 
   # This whole webhooks section is also settable per customer_code via
   # POST /delivery/policy (same endpoint routes/sitrep/summary already
-  # use) — see MSP-SETUP.md if running one instance across multiple
-  # client sites and each site needs its own webhook targets.
+  # use) — see MULTI-SITE-SETUP.md if running one instance across
+  # multiple sites and each site needs its own webhook targets.
 
 # ── SITREP / SUMMARY DELIVERY ─────────────────────────────────
 # SentinelReady can send you a periodic digest (a "sitrep") of everything
@@ -170,7 +170,7 @@ license:
   outcome_learning: true
   pattern_sequences: true
 
-  # ── Pro/MSP automatic license renewal (optional) ──
+  # ── Pro/Multi-Site automatic license renewal (optional) ──
   # Set this to the license key Lemon Squeezy emailed you at purchase —
   # SentinelReady will then periodically (every 12h by default) check in
   # automatically and refresh its own internal signed license key, so you
