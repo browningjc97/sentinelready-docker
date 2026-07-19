@@ -194,3 +194,15 @@ logs:
   snippet_paths:
     - /app/sentinel.log
   snippet_limit: 20
+
+# ── STORAGE / DATA RETENTION ──────────────────────────────────
+# Nightly housekeeping (2am) purges data past these windows, extracting
+# aggregated daily metrics (count/escalations/suppressions per alert
+# type) into a small permanent table first, so the statistical record
+# survives even after per-event detail ages out. Patterns, context
+# rules, correlations, and delivery policy are never purged — only the
+# raw event/outcome history below.
+storage:
+  outcomes_retention_days: 90   # alert_outcomes (resolution history)
+  events_retention_days: 90     # events.jsonl (per-alert digest source)
+  raw_payload_retention_days: 7 # reserved — no raw payload storage yet
