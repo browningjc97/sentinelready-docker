@@ -10,6 +10,26 @@ actually matters.
 
 ---
 
+## System Requirements
+
+- **RAM**: 8GB minimum, 16GB comfortable. Most of this is Ollama running
+  the `llama3.1` model (~5-6GB resident) — SentinelReady itself is
+  lightweight (well under 1GB).
+- **CPU**: 4 cores recommended. Ollama on CPU-only inference is slower
+  per alert (a few seconds), but the Behavior Pattern Library means
+  repeat alerts skip AI entirely after the first occurrence, so this
+  matters most in the first few days.
+- **Disk**: ~10GB free (model weights + Docker images + growing pattern
+  data).
+- **GPU**: not required. If present, Ollama uses it automatically and
+  triage is significantly faster.
+
+The included `docker-compose.yml` does not set memory/CPU limits on the
+containers, so on a small or shared machine, consider adding your own
+`deploy.resources.limits` if you want to cap what Ollama can consume.
+
+---
+
 ## Get Running in 3 Commands
 
 The image is currently private (early access) — you'll need to authenticate
@@ -450,6 +470,25 @@ Recommended limits for getting started:
 
 SR gets cheaper over time as pattern recognition eliminates repeat AI
 calls — most customers see 80% cost reduction within 90 days.
+
+---
+
+## Grafana Dashboards
+
+If you're already running Prometheus + Grafana (the included
+`docker-compose.yml` does not bundle these — bring your own or point at
+an existing stack), SentinelReady exposes Prometheus-format metrics at
+`GET /metrics`: alerts processed, escalations, sitreps delivered, AI
+calls avoided (pattern-cache hits), and patterns learned per customer.
+
+Import the dashboard:
+
+1. In Grafana, go to **Dashboards → New → Import**.
+2. Upload `dashboard/sentinelready-dashboard.json` (in this repo) or
+   paste its contents.
+3. Select your Prometheus datasource when prompted.
+4. Point that Prometheus instance at `your-host:8000/metrics` (add a
+   scrape job or ServiceMonitor, depending on your setup).
 
 ---
 
