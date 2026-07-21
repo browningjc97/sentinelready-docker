@@ -117,8 +117,21 @@ You should see something like:
 | UDM | `http://your-host:8000/webhook/udm` |
 | UniFi Protect | `http://your-host:8000/webhook/unifi-protect` |
 | Generic | `http://your-host:8000/webhook/generic` |
+| Anything else | `http://your-host:8000/webhook/auto` |
 
 Set the webhook secret header: `x-sentinel-secret: your-secret-from-yaml`
+
+**Bring your alerts from anywhere.** `/webhook/generic` expects your
+payload to already roughly match SentinelReady's own field names
+(`alert_name`, `severity`, etc.). If your alert source doesn't — a
+custom internal script, a niche tool, anything without a dedicated
+integration above — point it at `/webhook/auto` instead. The first time
+it sees that payload's shape, SentinelReady uses AI to figure out which
+field is which, once, and remembers that mapping for every future alert
+of the same shape — no reformatting on your end, no AI cost after the
+first alert of a new type. If AI can't be reached that first time, it
+falls back to best-effort field matching rather than dropping the
+alert — you never lose visibility over a mapping it hasn't learned yet.
 
 **No configuration needed for source/instance tracking.** When a flood of
 similar alerts gets collapsed into one summary, SentinelReady reports
