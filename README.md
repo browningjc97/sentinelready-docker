@@ -23,6 +23,14 @@ actually matters.
   data).
 - **GPU**: not required. If present, Ollama uses it automatically and
   triage is significantly faster.
+- **CPU architecture**: **amd64/x86_64 only** (standard Intel/AMD). Not
+  yet built for arm64 — if you're on an Apple Silicon Mac (M1/M2/M3/M4)
+  or an ARM-based Linux/Windows machine, this hasn't been tested and may
+  not run reliably even under emulation. Use an Intel/AMD machine or VM.
+
+**Before you start, install:**
+- **Docker Desktop** (Mac/Windows) — [docker.com/products/docker-desktop](https://www.docker.com/products/docker-desktop/) — or Docker Engine + the Compose plugin on Linux
+- **Git** — to clone the repo (`git --version` to check if you already have it)
 
 The included `docker-compose.yml` does not set memory/CPU limits on the
 containers, so on a small or shared machine, consider adding your own
