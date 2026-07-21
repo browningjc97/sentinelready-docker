@@ -28,9 +28,14 @@ actually matters.
   or an ARM-based Linux/Windows machine, this hasn't been tested and may
   not run reliably even under emulation. Use an Intel/AMD machine or VM.
 
-**Before you start, install:**
-- **Docker Desktop** (Mac/Windows) — [docker.com/products/docker-desktop](https://www.docker.com/products/docker-desktop/) — or Docker Engine + the Compose plugin on Linux
-- **Git** — to clone the repo (`git --version` to check if you already have it)
+**Before you start — check what you already have:**
+
+1. **Docker.** Check: `docker --version`
+   - Already installed? Skip to step 2.
+   - Missing? Install [Docker Desktop](https://www.docker.com/products/docker-desktop/) (Mac/Windows), or Docker Engine + the Compose plugin on Linux.
+2. **Git.** Check: `git --version`
+   - Already installed? Skip to "Get Running" below.
+   - Missing? Either install it ([git-scm.com](https://git-scm.com/downloads)), or skip `git clone` entirely — download `docker-compose.yml` and `sentinelready.yaml.example` directly from the repo page instead.
 
 The included `docker-compose.yml` does not set memory/CPU limits on the
 containers, so on a small or shared machine, consider adding your own
