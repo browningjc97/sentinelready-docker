@@ -1,6 +1,6 @@
 # SentinelReady
 
-**Your Virtual SRO. Always Watching. Never Surprised.**
+**Your reliability superpower.**
 
 SentinelReady sits between your monitoring tools and your team. Your
 monitoring tools keep doing what they do — SR makes sure the right
