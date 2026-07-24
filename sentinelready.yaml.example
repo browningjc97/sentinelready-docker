@@ -35,6 +35,26 @@ ai:
   #     -> Usage limits
   # SR gets cheaper over time as pattern recognition eliminates repeat
   # AI calls — most customers see 80% cost reduction within 90 days.
+  #
+  # Optional local $ estimate + warning, on top of the hard spend limit
+  # you set above (SR is BYO-key everywhere and never sees your real
+  # invoice, so this is a second, local-only signal, not a replacement).
+  # No safe default rate exists since pricing varies by model and changes
+  # over time — both default to 0 (off) until you fill in your model's
+  # current per-1K-token rates from your provider's pricing page:
+  # cost_per_1k_input_tokens: 0.003
+  # cost_per_1k_output_tokens: 0.015
+  # daily_budget_usd: 5.00           # one warning email/day once crossed; 0 = off
+
+  # Whether the full original alert payload (not just the extracted
+  # name/severity/description/value fields) gets included in the AI
+  # triage prompt. Default true — alert data essentially never contains
+  # anything worth withholding from the AI doing the triage, and this
+  # gives it access to whatever extra detail your monitoring tool sends
+  # that SentinelReady's normalizer doesn't explicitly extract. Set false
+  # if you have a specific reason to keep the raw payload out of the
+  # prompt.
+  # include_raw_payload: true
 
 # ── CUSTOMER ──────────────────────────────────────────────────
 customer:
@@ -149,10 +169,29 @@ alerting:
   # Severities listed here always page — never suppressed, never
   # downgraded, never flood-aggregated, regardless of learned-pattern
   # confidence or AI judgment. Not license-gated, free in both editions.
-  # Matches the incoming alert's own "severity" field. Empty by default —
-  # you decide what's sacred in your environment.
-  sacred_severities: []
+  # Matches the incoming alert's own "severity" field. Defaults to
+  # [critical] so the guarantee applies out of the box — remove entries
+  # or set to [] if you'd rather every severity go through normal AI
+  # judgment instead.
+  sacred_severities: [critical]
   # Example: sacred_severities: [critical, high]
+
+# ── MULTI-SIGNAL CORRELATION ──────────────────────────────────
+correlation:
+  # How close together (minutes) different alerts for the same team need
+  # to fire to be treated as one combined incident instead of separate
+  # ones (see "Manual Overrides" section above for the related
+  # suppress/always-alert mechanism). 15 min is a reasonable default for
+  # most cascading-failure scenarios — widen it if your infrastructure's
+  # failures tend to unfold more slowly.
+  window_minutes: 15
+
+# ── PATTERN OVERRIDES ──────────────────────────────────────────
+overrides:
+  # Default suppression/always-alert length (days) when POST /suppress or
+  # POST /always-alert omits "expires" and doesn't set "permanent": true.
+  # Never silently permanent — see the "Manual Overrides" README section.
+  default_expiry_days: 14
 
 # ── LICENSE ───────────────────────────────────────────────────
 license:
@@ -162,7 +201,10 @@ license:
   max_patterns: 50
   max_ssl_domains: 1
   max_users: 1
-  weekly_digest: false
+  # Community gets a taste of sitreps before hitting the paywall — the
+  # first N sitrep sends (lifetime, per customer_code) go out in full;
+  # after that, /sitrep/send returns a preview only until you upgrade.
+  free_sitreps: 5
   mobile_push: false
   # Outcome learning and pattern sequences are free in both Community and
   # Pro — not license-gated. Set to false yourself if you'd rather
@@ -186,14 +228,14 @@ kubernetes:
   # Enable if SentinelReady can reach your cluster API
   # Not required — log snippets will fall back to local files
   enabled: false
-  log_lines: 50
-  namespace: default
+  log_lines: 50          # how many recent log lines to pull per pod for AI context
+  namespace: default     # which k8s namespace to look for pods/logs in
 
 # ── LOGS ─────────────────────────────────────────────────────
 logs:
-  snippet_paths:
+  snippet_paths:         # local log file(s) to pull recent lines from for AI context
     - /app/sentinel.log
-  snippet_limit: 20
+  snippet_limit: 20      # how many recent lines to include per file
 
 # ── STORAGE / DATA RETENTION ──────────────────────────────────
 # Nightly housekeeping (2am) purges data past these windows, extracting
