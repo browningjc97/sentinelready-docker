@@ -187,6 +187,43 @@ SentinelReady also fails open — a slow AI dependency, an alert flood, or
 an exhausted daily budget all degrade to a visible raw alert rather than
 silence. You'll never lose an alert to an internal hiccup.
 
+SentinelReady also recognizes when several *different* alerts fire
+together for the same service in a short window — disk pressure, high
+latency, and a pod restart minutes apart is probably one cascading
+failure, not three unrelated blips. When that happens, you get one
+combined, higher-context escalation instead of three separate ones.
+
+---
+
+## Manual Overrides — suppress or force-alert a specific pattern
+
+**Important: this only affects delivery, never ingestion.** Suppressing
+a pattern does not touch your monitoring tool, and does not stop
+SentinelReady from receiving, logging, or learning from that alert — it
+still fires at the source, still gets triaged, still counts toward
+pattern history and metrics. The only thing suppression skips is the
+"escalate to a human" step.
+
+```bash
+curl -X POST http://your-host:8000/suppress \
+  -H "x-sentinel-secret: your-secret" \
+  -d '{"fingerprint_hash": "...", "reason": "known issue, fix scheduled 8/15", "expires": "2026-08-15"}'
+```
+
+- `expires` defaults to 14 days from now if you omit it — **suppression
+  is never silently permanent** unless you explicitly pass
+  `"permanent": true`.
+- The opposite toggle, `POST /always-alert` (same request shape), forces
+  a specific pattern to always escalate regardless of what the AI
+  decides — useful for a pattern you never want auto-classified as
+  noise, without changing your global severity settings.
+- `GET /overrides` lists everything currently active, plus anything that
+  **just expired and silently resumed escalating** — also surfaced
+  automatically in your sitrep, so an expired suppression never goes
+  unnoticed.
+- `DELETE /overrides/{fingerprint_hash}` cancels one early, if the issue
+  gets fixed before the expiry date.
+
 ---
 
 ## Sitreps — a periodic digest of everything SentinelReady saw
