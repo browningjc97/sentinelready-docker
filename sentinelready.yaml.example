@@ -69,6 +69,12 @@ customer:
   # Set your own value here instead if you'd rather choose it yourself.
   webhook_secret: change-me-please
 
+  # Separate password for the config Web UI (/ui) — not the same as
+  # webhook_secret above. Same auto-generate-and-print-to-logs behavior
+  # if you leave this as-is. Change it any time from the UI's own Admin
+  # page once you're logged in.
+  dashboard_password: change-me-please
+
 # ── DELIVERY ──────────────────────────────────────────────────
 delivery:
   # local = log only (default, good for getting started)
@@ -79,10 +85,16 @@ delivery:
   # gateway address (e.g. number@tmomail.net) works here too -- it's
   # still just an email address as far as SentinelReady is concerned.
   # Full carrier gateway table in README.md under "SMS Delivery".
+  # Community: 1 delivery target total across every route/webhook combined
+  # (see SPEC-delivery-target-cap.md) -- the default below is already right
+  # at that limit (all three routes point to the same one address). Add a
+  # second distinct address/webhook (e.g. uncomment "all" below) and
+  # SentinelReady will tell you it needs Pro.
   routes:
     sre:  ["you@yourcompany.com"]
     ops:  ["you@yourcompany.com"]
-    all:  ["you@yourcompany.com", "oncall@yourcompany.com"]
+    all:  ["you@yourcompany.com"]
+    # all:  ["you@yourcompany.com", "oncall@yourcompany.com"]  # Pro: 2nd target
 
   # SMTP settings (only needed if mode: smtp)
   smtp:
@@ -199,7 +211,6 @@ license:
   # Upgrade to Pro at sentinelready.io/upgrade
   tier: community
   max_patterns: 50
-  max_ssl_domains: 1
   max_users: 1
   # Community gets a taste of sitreps before hitting the paywall — the
   # first N sitrep sends (lifetime, per customer_code) go out in full;

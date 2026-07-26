@@ -197,6 +197,18 @@ combined, higher-context escalation instead of three separate ones.
 
 ## Manual Overrides — suppress or force-alert a specific pattern
 
+**Point-and-click alternative**: `http://your-host:8000/ui` is a full
+config dashboard — same endpoints underneath, just a UI on top. Log in
+with your **dashboard password**, a separate credential from
+`webhook_secret` (auto-generated and printed to your startup logs the
+same way, or set your own via `customer.dashboard_password` — see
+`sentinelready.yaml.example`; changeable any time from the UI's own
+Admin page). Pages: Dashboard (overview), Patterns & Overrides (this
+section), Sitrep Insights (Pro — live "patterns worth fixing" view, no
+AI call, no send), Delivery & Alerting (routing/webhook config), Sites
+& Customers (customer codes, Multi-Site org grouping), and Admin
+(account info, upgrade, password management).
+
 **Important: this only affects delivery, never ingestion.** Suppressing
 a pattern does not touch your monitoring tool, and does not stop
 SentinelReady from receiving, logging, or learning from that alert — it
