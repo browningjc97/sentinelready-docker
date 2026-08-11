@@ -409,9 +409,13 @@ This also works per-site if you're running Multi-Site tiers — see
 
 ## Known Limitations (Current Release)
 
-- Mobile push notifications — Pro feature, coming soon
-- SSL certificate monitoring — coming soon
-- Web dashboard — coming after Pro launch
+- No SentinelReady-native mobile push notification — a `mobile_push`
+  config toggle exists as an unwired placeholder. Alerts already reach
+  your phone today via Slack's own app, PagerDuty's own app, or SMS
+  through a carrier email-to-SMS gateway — none of that is Pro-only,
+  it's just subject to Community's 1-delivery-target cap.
+- No multi-user/team accounts — one shared dashboard password, no
+  per-user logins or roles.
 - SMTP delivery defaults to local logging — configure smtp section in yaml to enable email
 - Single-instance only — no HA/failover. See the reliability note above; pair
   with an external dead-man's-switch if that matters for your setup.
@@ -462,38 +466,98 @@ If you do need SentinelReady reachable from outside your network (e.g. a
 cloud-hosted alerting tool that can't reach your internal IPs), put it
 behind a reverse proxy or VPN rather than exposing port 8000 directly.
 
+### Optional: HTTPS via Caddy
+
+The dashboard (`/ui/login` and everything under `/ui/`) sends its
+credential over plain HTTP by default — fine on a private network you
+already trust, not fine if the instance is reachable more broadly.
+
+If you need a real TLS certificate in front of SentinelReady, use
+`docker-compose.https.yml` instead of the standard `docker-compose.yml`
+(not alongside it). It adds a [Caddy](https://caddyserver.com/) reverse
+proxy that automatically provisions and renews a real Let's Encrypt
+certificate for a domain you point at it, and removes SentinelReady's
+own direct port publish so Caddy is the only way in from outside:
+
+```bash
+cp Caddyfile.example Caddyfile   # then edit the domain inside
+docker compose -f docker-compose.https.yml up -d
+```
+
+Requires a real domain with DNS already pointed at this host, and ports
+80/443 reachable from the internet (80 only for the one-time renewal
+challenge). Not needed for a normal private-network/VPN setup — see
+above.
+
 ---
 
 ## Activating Pro
 
-If you've purchased Pro, you'll receive a license key. Set it in your
-`sentinelready.yaml`:
+There are two kinds of Pro key, and they activate differently. Use the
+one that matches how you got yours.
+
+### If you bought a subscription — `ls_license_key`
+
+Your purchase email contains a license key. Put it in
+`sentinelready.yaml` together with the tier:
 
 ```yaml
 license:
   tier: pro
+  ls_license_key: "PASTE-THE-KEY-FROM-YOUR-PURCHASE-EMAIL"
 ```
 
-And provide the key itself as an environment variable — add this to the
-`sentinelready` service in your `docker-compose.yml`:
+Then `docker compose up -d`. **That is the last time you touch it.**
 
-```yaml
-environment:
-  - SENTINEL_CONFIG=/app/sentinelready.yaml
-  - SENTINEL_LICENSE_KEY=<the key you were given>
-```
+SentinelReady checks in automatically every 12 hours, renews its own
+internal license, and applies it without a restart — through monthly
+renewals, card changes, and plan upgrades alike. You will never be asked
+to re-enter a key. If you cancel, the instance returns itself to
+Community on its own within 12 hours.
 
-Then `docker compose up -d` to restart with Pro unlocked. Check
-`docker compose logs sentinelready` — you should see a `License:` line
-confirming your customer name and expiry (if any). If the key is missing,
-invalid, or expired, SentinelReady automatically and silently falls back
-to Community — it never crashes or blocks alert delivery over a licensing
-problem.
+If a check-in can't get through — your network, or ours — nothing
+happens to you. It keeps the license it already has and retries. There's
+roughly a week of slack before a paid instance would degrade, so an
+ordinary outage is a non-event.
 
-This unlocks the Pro tier itself (unlimited patterns, team members, weekly
-digest, mobile push, email support) regardless of AI provider — Pro
-doesn't require switching off Ollama. Outcome learning ships free in both
-editions.
+**Don't paste this key into the Admin UI.** It's a store key, not an
+internal license key, and the UI will reject it as invalid.
+`ls_license_key` is the only place it belongs.
+
+### If you were handed a key directly — Admin UI
+
+Beta testers and offline/air-gapped customers get a key issued by hand.
+It's a long `eyJ0aWVy...`-style string, not a store key.
+
+Set `license: tier: pro` in `sentinelready.yaml`, `docker compose up -d`
+once, then log into the Config UI at `/ui/admin`, paste the key into the
+**License key** field, and save. It activates immediately, no restart.
+Use the same field whenever you're sent a replacement.
+
+These keys do **not** renew automatically — there's no subscription
+behind them. You'll be issued a new one before the current one expires.
+
+### One setting that breaks both
+
+If `SENTINEL_LICENSE_KEY` is set as an environment variable in your
+`docker-compose.yml`, it silently wins over everything above — automatic
+renewals and Admin UI saves will both appear to work and then do
+nothing. Older versions of these instructions told you to set it that
+way. **If that line is in your `docker-compose.yml`, remove it.**
+
+### Confirming it worked
+
+Check `docker compose logs sentinelready` for a `License:` line
+confirming your customer name and expiry. If a key is missing, invalid,
+or expired, SentinelReady falls back to Community rather than failing —
+it never crashes or blocks alert delivery over a licensing problem, so
+check that log line rather than assuming activation succeeded.
+
+This unlocks the Pro tier itself (unlimited patterns, unlimited delivery
+targets, email support) regardless of AI provider — Pro doesn't require
+switching off Ollama. Outcome learning and pattern sequences ship free
+in both editions — they're the product's actual intelligence, not a
+scale limit, so they're not held back from Community.
 
 Swapping the AI provider is a separate, unrelated step available in
 **either** edition — Community or Pro, you bring your own API key and

@@ -1,3 +1,7 @@
 # Real config — contains your webhook secret and license key, never commit
 sentinelready.yaml
 .env
+
+# Real domain goes here if using docker-compose.https.yml — edit
+# Caddyfile.example and save as Caddyfile, don't commit the real one
+Caddyfile

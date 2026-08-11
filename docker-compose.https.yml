@@ -1,0 +1,83 @@
+# Optional: SentinelReady behind Caddy, with automatic HTTPS.
+#
+# Use this instead of docker-compose.yml (not alongside it) when you need
+# the dashboard/webhook endpoint reachable with a real TLS certificate --
+# e.g. exposed beyond your own private network, or a compliance-conscious
+# customer expects it. For a normal private-network/VPN/localhost setup,
+# the plain docker-compose.yml is simpler and this isn't needed -- see the
+# README's "Firewall / network exposure" section.
+#
+# Requirements:
+#   - A real domain name, with DNS already pointed at this host's public IP
+#   - Ports 80 and 443 reachable from the internet (80 is only needed for
+#     the one-time Let's Encrypt HTTP-01 challenge; renewal is automatic
+#     after that)
+#   - Edit Caddyfile.example -> Caddyfile with your real domain before
+#     starting
+#
+# Run:
+#   cp Caddyfile.example Caddyfile   # then edit the domain inside
+#   docker compose -f docker-compose.https.yml up -d
+
+services:
+  ollama:
+    image: ollama/ollama:latest
+    container_name: sentinelready-ollama
+    volumes:
+      - ollama_models:/root/.ollama
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "ollama", "list"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 60s
+
+  ollama-pull:
+    image: ollama/ollama:latest
+    container_name: sentinelready-ollama-pull
+    depends_on:
+      ollama:
+        condition: service_healthy
+    entrypoint: ["/bin/sh", "-c", "OLLAMA_HOST=http://ollama:11434 ollama pull llama3.1"]
+    restart: "no"
+
+  sentinelready:
+    image: ghcr.io/browningjc97/sentinelready-docker:latest
+    container_name: sentinelready
+    # No published port on purpose -- Caddy is the only way in from
+    # outside this compose network. Still reachable by other containers
+    # on the network as http://sentinelready:8000.
+    expose:
+      - "8000"
+    volumes:
+      - sentinel_data:/app/scripts/data
+      - ./sentinelready.yaml:/app/sentinelready.yaml:ro
+    environment:
+      - SENTINEL_CONFIG=/app/sentinelready.yaml
+    depends_on:
+      ollama:
+        condition: service_healthy
+      ollama-pull:
+        condition: service_completed_successfully
+    restart: unless-stopped
+
+  caddy:
+    image: caddy:2-alpine
+    container_name: sentinelready-caddy
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy_data:/data
+      - caddy_config:/config
+    depends_on:
+      - sentinelready
+    restart: unless-stopped
+
+volumes:
+  sentinel_data:
+  ollama_models:
+  caddy_data:
+  caddy_config:

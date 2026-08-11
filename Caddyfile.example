@@ -1,0 +1,13 @@
+# Copy this to Caddyfile and replace the domain below with your own before
+# running docker-compose.https.yml. Caddy automatically provisions and
+# renews a real Let's Encrypt certificate for whatever domain you put here
+# -- no manual cert management needed.
+#
+# DNS for this domain must already point at this host's public IP, and
+# ports 80/443 must be reachable from the internet for the one-time
+# HTTP-01 challenge (renewal afterward doesn't need anything further from
+# you).
+
+your-domain.example.com {
+	reverse_proxy sentinelready:8000
+}

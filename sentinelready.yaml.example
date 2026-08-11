@@ -223,15 +223,20 @@ license:
   outcome_learning: true
   pattern_sequences: true
 
-  # ── Pro/Multi-Site automatic license renewal (optional) ──
-  # Set this to the license key Lemon Squeezy emailed you at purchase —
-  # SentinelReady will then periodically (every 12h by default) check in
-  # automatically and refresh its own internal signed license key, so you
-  # never have to manually re-issue one as your subscription renews.
-  # Leave blank if you were handed a manually-signed license key directly
-  # (e.g. as a beta tester) — this and manual keys are independent, don't
-  # set both.
-  # ls_license_key: ""
+  # ── Pro/Multi-Site subscriptions — REQUIRED if you bought one ──
+  # Set this to the license key emailed to you at purchase. This is what
+  # makes a subscription renew: SentinelReady checks in every 12h, gets a
+  # fresh internal signed key, and applies it with no restart, so you
+  # never re-enter anything as your subscription renews.
+  #
+  # Without this, a purchased subscription does NOT activate — the key
+  # from your purchase email only works here. It is not the same as the
+  # long `eyJ0aWVy...` key beta testers are handed directly, and it will
+  # be rejected if pasted into the Admin UI.
+  #
+  # Leave blank ONLY if you were handed a manually-signed key directly
+  # (e.g. as a beta tester) — the two are independent, don't set both.
+  ls_license_key: ""
   # refresh_url: https://sentinelready-license-refresh.browningjc97.workers.dev/license/refresh  # only override for testing
 
 # ── KUBERNETES (optional) ─────────────────────────────────────
