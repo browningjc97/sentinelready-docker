@@ -205,6 +205,27 @@ overrides:
   # Never silently permanent — see the "Manual Overrides" README section.
   default_expiry_days: 14
 
+# ── REPEAT SUPPRESSION ─────────────────────────────────────────
+repeat_suppression:
+  # Collapses a notification that says nothing new. Suppresses ONLY an
+  # identical restatement — same pattern, same host, same description,
+  # same urgency, same escalate decision — of something already sent
+  # within this window.
+  #
+  # A recurrence carrying new information is NEVER suppressed, no matter
+  # how often it happens: a genuinely new restart, a rising count, a new
+  # host, or a raised urgency all produce a different notification and go
+  # out immediately. This exists for upstream rules that re-report one
+  # unchanged event forever (the classic being a cumulative counter
+  # compared to zero, e.g. `kube_pod_container_status_restarts_total > 0`,
+  # which stays true for the life of the pod). Repeatedly restarting pods
+  # are a real problem and still reach you every time.
+  #
+  # When delivery resumes, the notification reports how many identical
+  # repeats were swallowed, so a compressed burst never reads as a
+  # one-off. Set to 0 to disable suppression entirely.
+  window_minutes: 60
+
 # ── LICENSE ───────────────────────────────────────────────────
 license:
   # Community edition limits — do not modify
