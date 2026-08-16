@@ -14,7 +14,22 @@ ai:
   enabled: true
   provider: ollama               # ollama | claude | openai_compatible
   model: llama3.1                # Ollama model to use
-  ollama_host: http://ollama:11434  # Internal compose service — do not change
+  # Where Ollama lives. The default points at the one docker-compose
+  # starts for you — leave it alone if you're using the bundled setup.
+  #
+  # ALREADY RUNNING OLLAMA? Point this at it instead of running a second
+  # copy (two instances each hold a multi-GB model resident and contend
+  # for the same GPU). Run ./setup.sh — it detects an existing Ollama and
+  # tells you exactly what to set. It will never modify, upgrade or
+  # restart an Ollama it didn't start; that one may be serving other
+  # workloads, so any change to it stays your call.
+  #   ollama_host: http://192.168.1.50:11434
+  # then start with:
+  #   docker compose -f docker-compose.yml -f docker-compose.external-ollama.yml up -d
+  #
+  # Ollama binds to 127.0.0.1 by default and won't accept connections from
+  # a container — set OLLAMA_HOST=0.0.0.0 on that host and restart it.
+  ollama_host: http://ollama:11434
 
   # ── openai_compatible only — ignored for ollama/claude ──
   # base_url: https://api.openai.com/v1        # or Groq/Together/OpenRouter/vLLM/etc.
@@ -226,11 +241,50 @@ repeat_suppression:
   # one-off. Set to 0 to disable suppression entirely.
   window_minutes: 60
 
+# ── BURST DETECTION ────────────────────────────────────────────
+burst:
+  # When several alerts for the same service arrive close together,
+  # SentinelReady stops trusting its cached "this is routine" verdict and
+  # re-triages with the AI. A pattern that was harmless yesterday may be a
+  # symptom of something real once it starts firing repeatedly, and the
+  # cache cannot know that.
+  #
+  # You will see this in the logs as:
+  #   Cache bypassed — burst signal detected for HighCPU (recent_same_service=4,
+  #   threshold=3, window=10m) — re-triaging once, then reusing that result
+  #
+  # This is normal and intentional. If you are evaluating the pattern
+  # cache by firing the same test alert repeatedly, this is why you see AI
+  # calls instead of instant cache hits — space the test alerts out past
+  # service_window_minutes, or set same_service_threshold higher.
+  same_service_threshold: 3   # alerts for one service+type before a burst is called
+  same_node_threshold: 2      # alerts for one node+type before a burst is called
+  service_window_minutes: 10  # rolling window for the service counter
+  node_window_minutes: 5      # rolling window for the node counter
+
+  # How often a burst may force a fresh triage for the SAME pattern.
+  # The first alert of a burst re-triages; the rest reuse that fresh
+  # result until this interval passes. Without it, every alert in a burst
+  # paid for its own inference — 18 identical alerts meant 18 model calls
+  # and zero cache hits, even at 0.98 confidence. Set to 0 to re-triage on
+  # every alert of a burst (the old behaviour, not recommended).
+  refresh_interval_minutes: 5
+
 # ── LICENSE ───────────────────────────────────────────────────
 license:
-  # Community edition limits — do not modify
-  # Upgrade to Pro at sentinelready.io/upgrade
+  # Your edition. Leave as `community` unless you have a paid key.
+  #
+  # IMPORTANT for Pro/Multi-Site customers: a valid license key on its own
+  # is NOT enough — you must ALSO set this to `pro` (or your Multi-Site
+  # tier). A key with `tier: community` here leaves the instance on
+  # Community limits.
   tier: community
+
+  # Community caps. These are IGNORED on Pro/Multi-Site — that tier is
+  # genuinely unlimited and the code bypasses these values entirely, so
+  # there is no need (and no benefit) to raising them by hand after
+  # upgrading. Lower them if you want a *tighter* limit than Community's
+  # default; raising them does not grant anything.
   max_patterns: 50
   max_users: 1
   # Community gets a taste of sitreps before hitting the paywall — the

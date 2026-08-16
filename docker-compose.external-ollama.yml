@@ -1,0 +1,51 @@
+# Use an Ollama you already run, instead of the bundled one (beta issue #15).
+#
+# The base docker-compose.yml always starts its own Ollama, and
+# sentinelready.yaml marked `ollama_host` as "Internal compose service —
+# do not change", so there was no supported way to point SentinelReady at
+# an existing install. That matters: Ollama holds a multi-GB model
+# resident, and anyone already running one does not want a second copy
+# competing for the same RAM or GPU.
+#
+# This overlay disables the bundled ollama and ollama-pull services and
+# points SentinelReady at yours instead.
+#
+# Usage — pass BOTH files, base first:
+#   OLLAMA_URL=http://192.168.1.50:11434 \
+#     docker compose -f docker-compose.yml -f docker-compose.external-ollama.yml up -d
+#
+# Then set the matching value in sentinelready.yaml:
+#   ai:
+#     ollama_host: http://192.168.1.50:11434
+#
+# Notes:
+#   - Pull the model yourself on that host: `ollama pull llama3.1`
+#     (nothing here does it for you — that was the bundled job's role).
+#   - Ollama binds to 127.0.0.1 by default and will NOT be reachable from
+#     a container. On the Ollama host set OLLAMA_HOST=0.0.0.0 and restart
+#     it, or the connection is refused.
+#   - `host.docker.internal` works for an Ollama on the same machine as
+#     Docker Desktop; on Linux use the host's LAN IP, or add
+#     `extra_hosts: ["host.docker.internal:host-gateway"]`.
+#   - Ollama has no authentication. Only point this at a host you control
+#     on a network you trust.
+
+services:
+  # `replicas: 0` keeps the service defined (so compose still resolves the
+  # depends_on in the base file) while starting no container for it.
+  ollama:
+    deploy:
+      replicas: 0
+
+  ollama-pull:
+    deploy:
+      replicas: 0
+
+  sentinelready:
+    # The base file waits for the bundled Ollama to be healthy and for the
+    # pull job to finish. Neither runs here, so those conditions would
+    # block startup forever — reset to an empty list.
+    depends_on: []
+    environment:
+      - SENTINEL_CONFIG=/app/sentinelready.yaml
+      - SENTINEL_OLLAMA_HOST=${OLLAMA_URL:?set OLLAMA_URL to your Ollama, e.g. http://192.168.1.50:11434}

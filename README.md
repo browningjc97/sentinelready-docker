@@ -21,8 +21,13 @@ actually matters.
   matters most in the first few days.
 - **Disk**: ~10GB free (model weights + Docker images + growing pattern
   data).
-- **GPU**: not required. If present, Ollama uses it automatically and
-  triage is significantly faster.
+- **GPU**: not required, and **not used by default even if you have one**.
+  Docker does not expose host GPUs to a container unless the compose file
+  reserves them, so the bundled Ollama runs on CPU until you opt in:
+  `docker compose -f docker-compose.yml -f docker-compose.gpu.yml up -d`
+  (needs the NVIDIA Container Toolkit — see `docker-compose.gpu.yml`).
+  It is opt-in because the reservation makes the service fail to start on
+  hosts without an NVIDIA runtime. With a GPU, triage is far faster.
 - **CPU architecture**: **amd64/x86_64 only** (standard Intel/AMD). Not
   yet built for arm64 — if you're on an Apple Silicon Mac (M1/M2/M3/M4)
   or an ARM-based Linux/Windows machine, this hasn't been tested and may
@@ -83,6 +88,33 @@ rules, and configuration are all preserved. SentinelReady stores everything
 in Docker volumes that are never touched by an upgrade.
 
 Downtime is the ~10 seconds it takes the container to restart.
+
+---
+
+## Changing Configuration
+
+After editing `sentinelready.yaml`, restart the container:
+
+```bash
+docker compose restart sentinelready
+```
+
+**`docker compose up -d` will not pick up config changes.** It compares
+the compose file and image, not the contents of files you've mounted —
+editing `sentinelready.yaml` changes neither, so compose reports the
+container up-to-date, does nothing, and SentinelReady keeps running
+the config it loaded at startup. Nothing warns you; the change simply has no
+effect.
+
+Confirm the new values actually loaded:
+
+```bash
+docker compose logs --tail 20 sentinelready
+curl -s localhost:8000/health | python3 -m json.tool
+```
+
+Two settings apply immediately with no restart at all: the license key
+and dashboard password, when set through the Admin page of the Web UI.
 
 ---
 
@@ -155,10 +187,21 @@ single-site Community/Pro customers can skip this entirely.
 
 ## Send a Test Alert
 
+**First, get your secret.** If you left `webhook_secret` at its default,
+SentinelReady generated one for you and printed it at startup:
+
+```bash
+docker compose logs sentinelready | grep -A2 "auto-generated"
+```
+
+Sending the literal `change-me-please` returns `401 Unauthorized` — that
+placeholder is precisely what triggers auto-generation. Use the value from
+the logs, or set your own in `sentinelready.yaml` and restart.
+
 ```bash
 curl -X POST http://localhost:8000/webhook/generic \
   -H "Content-Type: application/json" \
-  -H "x-sentinel-secret: change-me-please" \
+  -H "x-sentinel-secret: YOUR-SECRET-FROM-THE-LOGS" \
   -d '{
     "alert_name": "HighCPU",
     "service": "api-server",
@@ -180,6 +223,30 @@ no AI call needed, no delay, no cost.
 
 Over time it learns which alerts self-resolve, which ones need you,
 and adjusts its confidence automatically.
+
+### When it deliberately re-triages instead
+
+Two things override the cache on purpose, and both are visible in the logs:
+
+- **Low confidence.** A pattern needs to be seen a few times before
+  SentinelReady trusts its own verdict. Until then it asks the AI again.
+- **Burst detection.** If several alerts for the same service arrive close
+  together, the cached "this is routine" verdict is exactly the one you
+  should stop trusting — something that was harmless yesterday may be a
+  symptom once it starts firing repeatedly. SentinelReady re-triages once
+  per burst, then reuses that fresh result for the rest of it.
+
+```
+Cache bypassed — burst signal detected for HighCPU (recent_same_service=4,
+threshold=3, window=10m) — re-triaging once, then reusing that result
+```
+
+**If you are evaluating the pattern cache by firing the same test alert
+repeatedly, this is what you will hit** — you will see AI calls where you
+expected instant cache hits, and the library will look broken when it is
+working as designed. Either space your test alerts out past
+`burst.service_window_minutes`, or raise `burst.same_service_threshold`.
+Both are configurable in `sentinelready.yaml`.
 
 Community edition stores up to 50 behavior patterns.
 

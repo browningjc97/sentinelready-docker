@@ -1,0 +1,48 @@
+# GPU acceleration for Ollama — OPT-IN overlay (beta issue #1).
+#
+# The README said "if a GPU is present, Ollama uses it automatically."
+# That is true of Ollama itself, but NOT of Ollama in a container: Docker
+# does not expose host GPUs to a container unless the compose file
+# reserves them. Without the reservation below, Ollama inside the
+# container never sees the card and silently runs on CPU — the exact
+# symptom being slow triage on a machine that has a perfectly good GPU.
+#
+# This is a separate overlay rather than part of docker-compose.yml
+# because the reservation is NOT harmless on machines without one:
+# a host with no NVIDIA container runtime fails to start the service
+# outright ("could not select device driver"). Defaulting it on would
+# break every CPU-only install to help the minority with a GPU.
+#
+# Requires on the host:
+#   - an NVIDIA GPU with drivers installed
+#   - the NVIDIA Container Toolkit
+#     (https://docs.nvidia.com/datacenter/cloud-native/container-toolkit/)
+#   - verify with: docker run --rm --gpus all nvidia/cuda:12.4.0-base-ubuntu22.04 nvidia-smi
+#
+# Usage — pass BOTH files, base first:
+#   docker compose -f docker-compose.yml -f docker-compose.gpu.yml up -d
+#
+# Confirm it worked (should list your card, not "no GPU"):
+#   docker compose logs ollama | grep -i "gpu\|cuda\|library"
+#
+# AMD/ROCm users: use the ollama/ollama:rocm image and pass the render
+# devices instead — see Ollama's own Docker documentation.
+
+services:
+  ollama:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
+
+  ollama-pull:
+    deploy:
+      resources:
+        reservations:
+          devices:
+            - driver: nvidia
+              count: all
+              capabilities: [gpu]
