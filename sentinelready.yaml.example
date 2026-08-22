@@ -270,6 +270,27 @@ burst:
   # every alert of a burst (the old behaviour, not recommended).
   refresh_interval_minutes: 5
 
+# ── AI CALL GOVERNOR ───────────────────────────────────────────
+governor:
+  # Hard ceiling on how many AI enrichment calls SentinelReady will make.
+  # This is a runaway-cost brake, not a tuning knob — with a paid BYOK
+  # provider, an alert storm could otherwise generate a very large bill
+  # before you noticed.
+  #
+  # When a ceiling is reached, alerts are still DELIVERED — they just
+  # arrive raw and unenriched (reason code `enrichment_paused`) instead of
+  # triaged. Nothing is ever dropped. The daily counter resets at UTC
+  # midnight, and your sitrep reports how many alerts were affected.
+  #
+  # Most steady-state installs stay far below these: once patterns are
+  # learned, repeat alerts are served from cache and cost nothing. The
+  # likeliest time to hit the daily cap is your FIRST few days, when
+  # nothing is cached yet and every new pattern is a fresh AI call. If you
+  # are onboarding a noisy environment and see `enrichment_paused` in the
+  # logs or sitrep, raise max_calls_per_day rather than assume AI broke.
+  max_calls_per_minute: 20
+  max_calls_per_day: 500
+
 # ── LICENSE ───────────────────────────────────────────────────
 license:
   # Your edition. Leave as `community` unless you have a paid key.

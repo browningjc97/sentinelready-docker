@@ -116,6 +116,33 @@ curl -s localhost:8000/health | python3 -m json.tool
 Two settings apply immediately with no restart at all: the license key
 and dashboard password, when set through the Admin page of the Web UI.
 
+### Operational tuning reference
+
+Everything below is **`sentinelready.yaml` only** — the Web UI does not
+edit these, and each needs `docker compose restart sentinelready` to take
+effect. Defaults suit most installs; these are here so that when
+SentinelReady does something unexpected, you can find the setting
+responsible instead of guessing.
+
+| Setting | Default | What it controls |
+|---|---|---|
+| `governor.max_calls_per_day` | `500` | Hard ceiling on **AI enrichments** per day — not alerts. Past it, alerts still deliver, just raw (`enrichment_paused`). Most likely to trip in your first days, before patterns are cached. |
+| `governor.max_calls_per_minute` | `20` | Same, per minute. Smooths bursts. |
+| `burst.same_service_threshold` | `3` | Alerts for one service+type before the pattern cache is bypassed and SentinelReady re-triages. |
+| `burst.service_window_minutes` | `10` | Rolling window for the counter above. |
+| `burst.refresh_interval_minutes` | `5` | How often a burst may force a fresh triage for the *same* pattern. The first alert of a burst re-triages; the rest reuse that result. |
+| `repeat_suppression.window_minutes` | `60` | Suppresses a notification identical to one already sent. Anything carrying new information — a new occurrence, a new host, a higher urgency — is never suppressed. `0` disables. |
+| `correlation.window_minutes` | `15` | How close together distinct alerts must be to be treated as one cascading event. |
+| `fingerprint.min_confidence` | `0.7` | How confident a learned pattern must be before its cached verdict is reused instead of calling the AI. |
+| `fingerprint.cache_enabled` | `true` | Turns the pattern cache off entirely. Every alert then pays for an AI call — diagnostic use only. |
+| `overrides.default_expiry_days` | `14` | How long a `/suppress` lasts when you don't specify. Never silently permanent. |
+| `ai.daily_budget_usd` | `0` (off) | Sends **one warning email per day** when a local cost estimate crosses this. It is a signal, not a cap — it does not stop anything. |
+
+Two of these are the usual answer to "why is it calling the AI when it
+already knows this pattern?" — `burst.*` (it's re-triaging on purpose)
+and `fingerprint.min_confidence` (it hasn't seen it enough times yet).
+Both announce themselves in the logs.
+
 ---
 
 ## Verify It's Running
