@@ -291,6 +291,19 @@ governor:
   max_calls_per_minute: 20
   max_calls_per_day: 500
 
+
+# ── LOGGING ────────────────────────────────────────────────────
+logging:
+  # SentinelReady writes its log beside the databases, inside the data
+  # volume, so it survives container restarts — a log that vanishes on
+  # redeploy loses exactly the evidence you need to explain what went wrong.
+  #
+  # Rotation is always on. max_bytes x (backup_count + 1) is the hard ceiling
+  # on total disk used; because the log shares a volume with your pattern
+  # databases, an unbounded log would eventually fill the space they need.
+  max_bytes: 10000000      # 10 MB per file
+  backup_count: 3          # keep 3 rotations — 40 MB total ceiling
+
 # ── LICENSE ───────────────────────────────────────────────────
 license:
   # Your edition. Leave as `community` unless you have a paid key.

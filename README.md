@@ -116,6 +116,45 @@ curl -s localhost:8000/health | python3 -m json.tool
 Two settings apply immediately with no restart at all: the license key
 and dashboard password, when set through the Admin page of the Web UI.
 
+### Troubleshooting: the Doctor report
+
+When something isn't working and you're not sure why, run:
+
+```bash
+docker compose exec sentinelready /app/nuitka_launcher.bin --doctor
+```
+
+It prints a plain-language report designed to be **read aloud over the phone**
+— every section ends in a verdict, and anything wrong is marked `[WARN]`.
+
+Three narrower commands are available when you know what you're looking at:
+
+| Command | Answers |
+|---|---|
+| `--doctor` | Everything below, in one report |
+| `--license` | What tier am I actually running as, and why? |
+| `--webhook` | What outbound webhooks are wired up? |
+
+**What it checks** — deliberately, these are the things that fail *silently*.
+SentinelReady keeps running and keeps reporting success in every one of them,
+so a normal health check passes while the thing you care about has stopped:
+
+- **Licence** — expired keys, a Pro key that isn't taking effect, and the
+  `SENTINEL_LICENSE_KEY` environment variable silently overriding a
+  subscription key so renewals never apply.
+- **Free sitrep allowance** — on Community, sitreps are still generated after
+  the lifetime allowance is spent, but returned as a preview instead of being
+  delivered. Nothing errors; the digests simply stop arriving.
+- **Delivery mode** — `local` means log-only. This is the single most common
+  cause of "SentinelReady isn't sending me anything."
+- **AI provider** — reachable? is the model you configured actually pulled?
+  has the daily call ceiling been hit (which turns enrichment off until UTC
+  midnight while alerts keep flowing raw)?
+- **Ingestion** — are alerts arriving at all? This separates "SentinelReady is
+  broken" from "your monitoring tool stopped sending," which look identical
+  from the outside.
+- **Pattern cap** — on Community, learning stops at the cap with no notice.
+
 ### Operational tuning reference
 
 Everything below is **`sentinelready.yaml` only** — the Web UI does not
