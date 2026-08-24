@@ -1,0 +1,42 @@
+# Keep credentials and local state out of the build context.
+#
+# The build does not COPY any of these today -- Dockerfile.nuitka names its
+# sources explicitly (scripts, docs, requirements.txt). This file exists so
+# that stays true by construction rather than by everyone remembering. A
+# single `COPY . .` added later would otherwise ship the Ed25519 license
+# signing key into every customer image, and whoever holds that key can mint
+# licenses for any tier forever.
+#
+# Excluding them also stops the daemon from ever receiving them.
+
+# Signing / licensing key material -- the highest-value secret we hold
+*.hex
+*.hex.enc
+*.pem
+*.key
+*.jwk
+
+# Runtime secrets and local credentials
+.env
+.env.*
+!.env.example
+webhook_secret.txt
+dashboard_password.txt
+
+# Local state: pattern databases, logs, license files, backups
+scripts/data/
+data/
+*.db
+*.db-journal
+*.log
+backups/
+
+# VCS, tooling and editor noise
+.git
+.gitignore
+.venv
+venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.DS_Store
