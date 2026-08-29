@@ -33,13 +33,13 @@ license registration, or a support request.
   infrastructure. Every outbound network call the software makes is to a
   destination *you* configured — there is no hidden default endpoint.
   The one exception is documented and narrow: instances running a paid
-  subscription periodically contact our licence service to renew their
-  entitlement. That check-in carries the licence key and an instance
+  subscription periodically contact our license service to renew their
+  entitlement. That check-in carries the license key and an instance
   identifier only — never alert data, patterns, or configuration.
 
 ### How long we keep it
 
-We retain licence and purchase records for as long as your subscription
+We retain license and purchase records for as long as your subscription
 is active, and afterwards for as long as required to meet tax,
 accounting, and legal obligations. We retain support correspondence for
 up to twenty-four (24) months, after which it is deleted.
@@ -136,7 +136,7 @@ We may update this policy from time to time. When we do, we will change
 the version and effective date at the top of this document and publish
 the updated policy at the same location as this one. For material
 changes, we will additionally give notice by email to the address
-associated with your licence at least thirty (30) days before the change
+associated with your license at least thirty (30) days before the change
 takes effect.
 
 ## Contact

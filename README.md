@@ -139,7 +139,7 @@ Three narrower commands are available when you know what you're looking at:
 SentinelReady keeps running and keeps reporting success in every one of them,
 so a normal health check passes while the thing you care about has stopped:
 
-- **Licence** — expired keys, a Pro key that isn't taking effect, and the
+- **License** — expired keys, a Pro key that isn't taking effect, and the
   `SENTINEL_LICENSE_KEY` environment variable silently overriding a
   subscription key so renewals never apply.
 - **Free sitrep allowance** — on Community, sitreps are still generated after
