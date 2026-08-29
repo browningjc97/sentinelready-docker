@@ -1,0 +1,27 @@
+# License
+
+This repository contains **deployment files** for SentinelReady: Docker
+Compose files, an example configuration, an example Caddyfile, a setup
+script, a Grafana dashboard definition, and documentation.
+
+## These deployment files
+
+Copyright (c) 2026 SentinelReady, LLC.
+
+You are granted permission to use, copy, modify, and distribute the
+files in this repository for the purpose of deploying, configuring, and
+operating SentinelReady. Adapt them freely to your environment — that
+is what they are for.
+
+THESE FILES ARE PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS
+OR IMPLIED.
+
+## The SentinelReady software itself
+
+The SentinelReady container image
+(`ghcr.io/browningjc97/sentinelready-docker`) is **not** covered by the
+grant above. It is proprietary software licensed under the Terms of
+Service in [TOS.md](TOS.md). Running it means accepting those Terms.
+
+Community edition is free to use within the limits described in the
+Terms. Pro and Multi-Site require a valid license key.

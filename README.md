@@ -764,6 +764,31 @@ Import the dashboard:
 
 ---
 
+## Terms and Privacy
+
+Running SentinelReady means accepting the Terms of Service.
+
+- **[Terms of Service](TOS.md)** — what SentinelReady is, what the
+  license grants, and how liability works. Section 3 is worth reading
+  even if you skip the rest: it explains plainly what the software
+  guarantees structurally (it never *silently* drops an alert) and what
+  it does not (the correctness of any individual triage decision).
+- **[Privacy Policy](PRIVACY.md)** — short version: the software is
+  self-hosted and your alert data never reaches us. The one exception is
+  documented there, and it is narrow.
+- **[License](LICENSE)** — the deployment files in this repository are
+  yours to adapt; the container image is proprietary and governed by the
+  Terms.
+
+If you configure a third-party AI provider (Claude, OpenAI, or any
+OpenAI-compatible endpoint) instead of the default local Ollama, alert
+content is sent to that provider using your own API key, and their
+billing and privacy terms apply — not ours. Both documents above cover
+this; it is the one place where data leaves your infrastructure, and it
+only happens because you configured it.
+
+---
+
 ## Feedback
 
 This is early access, invite-only for now. Your feedback shapes what
