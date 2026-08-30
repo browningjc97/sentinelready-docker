@@ -528,7 +528,6 @@ This also works per-site if you're running Multi-Site tiers — see
 - AI triage via Ollama (local, free, your hardware)
 - Behavior Pattern Library (50 patterns)
 - Environment context rules — tell SentinelReady what's normal
-- Causal correlation — detects node failure cascades and memory patterns
 - Outcome learning — free in both Community and Pro
 - Escalation decision engine — escalate, sitrep, or suppress
 - Read-only status page: `GET /status`
@@ -548,6 +547,14 @@ This also works per-site if you're running Multi-Site tiers — see
 - SMTP delivery defaults to local logging — configure smtp section in yaml to enable email
 - Single-instance only — no HA/failover. See the reliability note above; pair
   with an external dead-man's-switch if that matters for your setup.
+- Causal correlation is narrow in this release. Two rules exist — a node
+  failure cascade (two or more distinct services failing on the same node
+  within a short window) and a repeated memory/OOM pattern on one service.
+  Both need a `node` label that many Prometheus pod alerts don't send, so
+  in practice they fire rarely. Correlation learned from your own alert
+  history — noticing that X and Y reliably precede Z — is planned, not
+  shipped. Nothing depends on it: triage, suppression and escalation all
+  work without it.
 
 ---
 
