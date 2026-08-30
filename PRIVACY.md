@@ -124,7 +124,7 @@ respond within thirty (30) days. We will not discriminate against you
 for making a request.
 
 We do not sell personal information, and we do not share it for
-cross-context behavioural advertising.
+cross-context behavioral advertising.
 
 Note that your alert data, patterns, and configuration never reach us at
 all — those live only on your own infrastructure, so a request to us
