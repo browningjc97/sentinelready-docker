@@ -28,6 +28,13 @@ actually matters.
   (needs the NVIDIA Container Toolkit — see `docker-compose.gpu.yml`).
   It is opt-in because the reservation makes the service fail to start on
   hosts without an NVIDIA runtime. With a GPU, triage is far faster.
+- **Already running Ollama elsewhere?** Don't run a second copy. Use
+  `docker compose -f docker-compose.yml -f docker-compose.external-ollama.yml up -d`
+  with `OLLAMA_URL` set to your existing host — for example
+  `OLLAMA_URL=http://192.168.1.50:11434`. That override scales the bundled
+  Ollama to zero replicas and points SentinelReady at yours instead, so you
+  keep one model server and one place to manage models. It is an override,
+  like the GPU file — pass both `-f` flags, not this one alone.
 - **CPU architecture**: **amd64/x86_64 only** (standard Intel/AMD). Not
   yet built for arm64 — if you're on an Apple Silicon Mac (M1/M2/M3/M4)
   or an ARM-based Linux/Windows machine, this hasn't been tested and may
