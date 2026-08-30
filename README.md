@@ -57,17 +57,6 @@ containers, so on a small or shared machine, consider adding your own
 
 ## Get Running in 3 Commands
 
-The image is currently private (early access) — you'll need to authenticate
-once before the first pull. You should have received a token separately;
-if not, ask for one.
-
-```bash
-docker login ghcr.io -u YOUR_GITHUB_USERNAME
-# paste the token you were given when prompted for a password
-```
-
-Then:
-
 ```bash
 git clone https://github.com/browningjc97/sentinelready-docker
 cd sentinelready-docker
@@ -798,8 +787,8 @@ only happens because you configured it.
 
 ## Feedback
 
-This is early access, invite-only for now. Your feedback shapes what
-ships to general availability.
+Found a bug, or something that should work better? Tell me — a solo
+project improves fastest when the people running it say what broke.
 
 - Bugs: open an issue on this repo
 - Ideas: email jeff@sentinelready.io
