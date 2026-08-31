@@ -757,8 +757,43 @@ Recommended limits for getting started:
 - OpenAI API: $20/mo at platform.openai.com → Settings → Billing →
   Usage limits
 
-SR gets cheaper over time as pattern recognition eliminates repeat AI
-calls — most customers see 80% cost reduction within 90 days.
+### What it actually costs
+
+Measured 2026-08-31 against a full-size triage prompt — alert fields, four
+similar past incidents, environment context rules, a causal correlation,
+pattern-frequency data and the raw payload. That came to **1,041 input
+tokens and 657 output tokens**:
+
+| Provider / model | Per alert | Per 1,000 alerts |
+|---|---|---|
+| Claude Opus 5 | ~$0.022 | ~$22 |
+| Claude Sonnet 5 | ~$0.009 | ~$9 |
+| Claude Haiku 4.5 | ~$0.004 | ~$4 |
+
+**Output tokens dominate** — they cost about 5x input and there are usually
+more of them, because current models reason before answering and that
+reasoning is billed as output. Sending a bigger prompt is cheap; getting a
+longer answer is not. If you want to cut cost, a smaller model moves the
+number far more than trimming what you send.
+
+Two things bound your spend regardless. `ai.governor.max_calls_per_day`
+(default 500) is a hard ceiling on AI calls — at 500/day that is roughly
+$11/day on Opus 5, $2/day on Haiku. And your provider's own spending limit,
+above, is the backstop if anything unexpected happens.
+
+`ai.daily_budget_usd` is **not** a cap — it sends one warning email a day
+once crossed and stops nothing. The governor is the thing that actually
+limits calls.
+
+### Does it get cheaper over time?
+
+The mechanism is real: once a pattern's confidence passes the caching
+threshold, repeat instances are answered from the pattern library with no AI
+call at all — no cost, no latency. How much that saves depends entirely on
+how repetitive your alerts are, and a noisy environment benefits far more
+than a quiet one. We are not going to quote you a percentage we have not
+measured across real deployments. Watch `ai_calls_avoided` in `GET /metrics`
+to see the actual figure for *your* environment.
 
 ---
 
