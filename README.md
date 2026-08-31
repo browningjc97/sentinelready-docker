@@ -538,10 +538,24 @@ This also works per-site if you're running Multi-Site tiers — see
 ## Known Limitations (Current Release)
 
 - No SentinelReady-native mobile push notification — a `mobile_push`
-  config toggle exists as an unwired placeholder. Alerts already reach
-  your phone today via Slack's own app, PagerDuty's own app, or SMS
-  through a carrier email-to-SMS gateway — none of that is Pro-only,
-  it's just subject to Community's 1-delivery-target cap.
+  config toggle exists as an unwired placeholder. Alerts reach your phone
+  through Slack's own app, PagerDuty's own app, or SMS via a carrier
+  email-to-SMS gateway — none of that is Pro-only, it's just subject to
+  Community's 1-delivery-target cap.
+
+  **Configure at least one outbound webhook.** How an escalation is
+  delivered depends on its urgency, and the two paths are not equivalent:
+
+  - **Critical** escalates over SMS/email to your configured delivery
+    targets, *and* fires any webhook you have set for the `critical` tier.
+  - **High** escalates over the webhook set for the `high` tier only. The
+    native push channel it would otherwise use is the unwired placeholder
+    above, so if no `high` webhook is configured, a high-urgency
+    escalation is recorded, learned from and shown in the sitrep, but is
+    not delivered anywhere at the time it fires.
+
+  Configuring a Slack or PagerDuty webhook for both tiers closes this.
+  `GET /doctor` reports when no delivery targets are configured at all.
 - No multi-user/team accounts — one shared dashboard password, no
   per-user logins or roles.
 - SMTP delivery defaults to local logging — configure smtp section in yaml to enable email
