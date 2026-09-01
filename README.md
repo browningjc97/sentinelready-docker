@@ -400,9 +400,15 @@ summary:
     - "manager@yourcompany.com"
 ```
 
-Community edition includes 5 free sitrep sends (lifetime, per team);
-after that, `/sitrep/send` returns a preview only until you upgrade to
-Pro for unlimited sitreps.
+Community edition includes 5 free sitrep sends (lifetime, per team).
+After those, SentinelReady keeps sending a **weekly heartbeat** instead —
+how many alerts it handled, how many it escalated, how many it kept off
+your phone, and how many patterns it has learned. Counts only: no AI
+summary, no Patterns Worth Fixing, no critical analysis. Those stay Pro.
+
+The heartbeat does not expire. A Community instance never goes silent on
+you, so a working install is never indistinguishable from a dead one.
+Upgrade to Pro for unlimited full digests.
 
 ---
 
