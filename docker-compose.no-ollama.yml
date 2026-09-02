@@ -1,0 +1,44 @@
+# Run with a hosted AI provider (Claude, or any OpenAI-compatible API) and
+# NO local model at all.
+#
+# The base docker-compose.yml always starts Ollama and blocks sentinelready
+# on `ollama-pull` finishing. That is right for the default setup, but if
+# `ai.provider` is `claude` or `openai_compatible` the bundled Ollama
+# downloads a multi-GB model that is then never used -- and startup waits
+# for that download before the app will run at all.
+#
+# Usage:
+#   1. In sentinelready.yaml set:
+#        ai:
+#          provider: claude          # or: openai_compatible
+#          model: claude-opus-5      # a model that provider actually serves
+#
+#   2. Put the key in .env (NOT in sentinelready.yaml -- that file is
+#      mounted into the container and is the one you are most likely to
+#      paste into a support thread):
+#        ANTHROPIC_API_KEY=sk-ant-...       # provider: claude
+#        SENTINEL_AI_API_KEY=...            # provider: openai_compatible
+#
+#   3. docker compose -f docker-compose.yml -f docker-compose.no-ollama.yml up -d
+#
+# Note: this sends alert context to a third party you have a contract with,
+# and that provider bills you directly -- SentinelReady never sees or proxies
+# the cost. If that is not acceptable for your data, keep the default Ollama
+# setup, which never leaves the host.
+
+services:
+  # `replicas: 0` keeps each service defined -- so compose can still resolve
+  # the base file's depends_on -- while starting no container for it.
+  ollama:
+    deploy:
+      replicas: 0
+
+  ollama-pull:
+    deploy:
+      replicas: 0
+
+  sentinelready:
+    # The base file waits for Ollama to be healthy and for the pull job to
+    # complete. Neither runs here, so those conditions would block startup
+    # forever -- reset to an empty list.
+    depends_on: []

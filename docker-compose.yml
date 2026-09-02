@@ -31,7 +31,7 @@ services:
     restart: "no"
 
   sentinelready:
-    image: ghcr.io/browningjc97/sentinelready-docker:latest
+    image: ghcr.io/sentinelready/sentinelready-docker:latest
     container_name: sentinelready
     ports:
       - "8000:8000"
@@ -40,6 +40,12 @@ services:
       - ./sentinelready.yaml:/app/sentinelready.yaml:ro
     environment:
       - SENTINEL_CONFIG=/app/sentinelready.yaml
+      # BYOK keys are never written to sentinelready.yaml -- they come from
+      # the environment (.env) so they stay out of the mounted config file.
+      # Empty defaults keep compose quiet when they are unset: the default
+      # provider is Ollama, which needs no key at all.
+      - ANTHROPIC_API_KEY=${ANTHROPIC_API_KEY:-}
+      - SENTINEL_AI_API_KEY=${SENTINEL_AI_API_KEY:-}
     depends_on:
       ollama:
         condition: service_healthy

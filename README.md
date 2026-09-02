@@ -58,7 +58,7 @@ containers, so on a small or shared machine, consider adding your own
 ## Get Running in 3 Commands
 
 ```bash
-git clone https://github.com/browningjc97/sentinelready-docker
+git clone https://github.com/sentinelready/sentinelready-docker
 cd sentinelready-docker
 cp sentinelready.yaml.example sentinelready.yaml
 # Edit sentinelready.yaml — set your webhook_secret and team name

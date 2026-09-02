@@ -19,7 +19,7 @@ OR IMPLIED.
 ## The SentinelReady software itself
 
 The SentinelReady container image
-(`ghcr.io/browningjc97/sentinelready-docker`) is **not** covered by the
+(`ghcr.io/sentinelready/sentinelready-docker`) is **not** covered by the
 grant above. It is proprietary software licensed under the Terms of
 Service in [TOS.md](TOS.md). Running it means accepting those Terms.
 

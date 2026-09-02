@@ -43,7 +43,7 @@ services:
     restart: "no"
 
   sentinelready:
-    image: ghcr.io/browningjc97/sentinelready-docker:latest
+    image: ghcr.io/sentinelready/sentinelready-docker:latest
     container_name: sentinelready
     # No published port on purpose -- Caddy is the only way in from
     # outside this compose network. Still reachable by other containers
