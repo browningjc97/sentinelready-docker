@@ -273,7 +273,11 @@ burst:
   # paid for its own inference — 18 identical alerts meant 18 model calls
   # and zero cache hits, even at 0.98 confidence. Set to 0 to re-triage on
   # every alert of a burst (the old behaviour, not recommended).
-  refresh_interval_minutes: 5
+  # NO LONGER USED (2026-09-01). A burst no longer forces a fresh triage --
+  # it reuses the cached decision and escalates it to the digest instead --
+  # so there is nothing left for this to rate-limit. Accepted without error
+  # so existing configs keep loading; removed in 1.1.
+  refresh_interval_minutes: 30
 
 # ── AI CALL GOVERNOR ───────────────────────────────────────────
 governor:

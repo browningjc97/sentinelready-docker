@@ -165,7 +165,7 @@ responsible instead of guessing.
 | `governor.max_calls_per_minute` | `20` | Same, per minute. Smooths bursts. |
 | `burst.same_service_threshold` | `3` | Alerts for one service+type before the pattern cache is bypassed and SentinelReady re-triages. |
 | `burst.service_window_minutes` | `10` | Rolling window for the counter above. |
-| `burst.refresh_interval_minutes` | `5` | How often a burst may force a fresh triage for the *same* pattern. The first alert of a burst re-triages; the rest reuse that result. |
+| `burst.refresh_interval_minutes` | — | **No longer used.** A burst no longer forces a fresh triage, so there is nothing for this to rate-limit. Setting it has no effect; it is accepted without error only so existing configs keep loading, and will be removed in 1.1. |
 | `repeat_suppression.window_minutes` | `60` | Suppresses a notification identical to one already sent. Anything carrying new information — a new occurrence, a new host, a higher urgency — is never suppressed. `0` disables. |
 | `correlation.window_minutes` | `15` | How close together distinct alerts must be to be treated as one cascading event. |
 | `fingerprint.min_confidence` | `0.7` | How confident a learned pattern must be before its cached verdict is reused instead of calling the AI. |
@@ -286,29 +286,30 @@ no AI call needed, no delay, no cost.
 Over time it learns which alerts self-resolve, which ones need you,
 and adjusts its confidence automatically.
 
-### When it deliberately re-triages instead
+### When it re-triages, and when it just escalates harder
 
-Two things override the cache on purpose, and both are visible in the logs:
+**Low confidence** is the only thing that sends a known pattern back to the
+AI. A pattern needs to be seen a few times before SentinelReady trusts its
+own verdict; until then it asks again. Once a pattern is trusted, repeat
+alerts are served from the library and cost nothing.
 
-- **Low confidence.** A pattern needs to be seen a few times before
-  SentinelReady trusts its own verdict. Until then it asks the AI again.
-- **Burst detection.** If several alerts for the same service arrive close
-  together, the cached "this is routine" verdict is exactly the one you
-  should stop trusting — something that was harmless yesterday may be a
-  symptom once it starts firing repeatedly. SentinelReady re-triages once
-  per burst, then reuses that fresh result for the rest of it.
+**Burst detection does not cause an AI call.** If several alerts for the same
+service arrive close together, the cached "this is routine" verdict is
+exactly the one you should stop trusting — something harmless yesterday may
+be a symptom once it starts firing repeatedly. But re-triaging is the
+expensive answer to that, and it is not the one that keeps you safe: the
+cache stores the *decision*, not just the diagnosis, so what matters is not
+asking again, it is refusing to stay silent. A pattern that would normally be
+suppressed is surfaced in the digest instead while it is bursting:
 
 ```
-Cache bypassed — burst signal detected for HighCPU (recent_same_service=4,
-threshold=3, window=10m) — re-triaging once, then reusing that result
+Known noise, but bursting — surfaced in digest (recent_same_service=4,
+threshold=3, window=10m)
 ```
 
-**If you are evaluating the pattern cache by firing the same test alert
-repeatedly, this is what you will hit** — you will see AI calls where you
-expected instant cache hits, and the library will look broken when it is
-working as designed. Either space your test alerts out past
-`burst.service_window_minutes`, or raise `burst.same_service_threshold`.
-Both are configurable in `sentinelready.yaml`.
+Same protection, no inference cost. Firing the same test alert repeatedly
+will therefore show cache hits, not AI calls — the burst only changes where
+the result is delivered.
 
 Community edition stores up to 50 behavior patterns.
 
