@@ -805,8 +805,14 @@ threshold, repeat instances are answered from the pattern library with no AI
 call at all — no cost, no latency. How much that saves depends entirely on
 how repetitive your alerts are, and a noisy environment benefits far more
 than a quiet one. We are not going to quote you a percentage we have not
-measured across real deployments. Watch `ai_calls_avoided` in `GET /metrics`
-to see the actual figure for *your* environment.
+measured across real deployments. Watch **Answered from memory** on the Admin
+dashboard (`ai_calls_avoided` in `GET /metrics`) to see the actual figure for
+*your* environment.
+
+Before 1.0.7 that figure counted only one of the two cache paths, so it
+under-reported what SentinelReady had actually saved you. If it looks like it
+jumped after upgrading, nothing changed in behaviour — it is now counting
+correlation-combo answers too, which it always should have.
 
 ---
 
