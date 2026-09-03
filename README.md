@@ -283,8 +283,14 @@ The first time an alert fires, AI triages it and stores the result.
 The second time the same pattern fires, it recognizes it instantly —
 no AI call needed, no delay, no cost.
 
-Over time it learns which alerts self-resolve, which ones need you,
-and adjusts its confidence automatically.
+Over time it learns which alerts clear quickly, which ones need you, and
+adjusts its confidence automatically as its own verdicts prove consistent.
+
+It does not claim to know whether an alert resolved *itself*. Your alerting
+system tells SentinelReady when an alert cleared, but an alert an engineer
+fixed and one that cleared on its own look identical from outside. If you want
+that distinction recorded, tell it: `POST /outcomes/{fingerprint_hash}/intervened`
+with a short note. That is the one thing it cannot observe for you.
 
 ### When it re-triages, and when it just escalates harder
 

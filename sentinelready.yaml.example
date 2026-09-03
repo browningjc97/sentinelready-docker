@@ -338,6 +338,18 @@ license:
   # Outcome learning and pattern sequences are free in both Community and
   # Pro — not license-gated. Set to false yourself if you'd rather
   # SentinelReady not track alert outcomes at all.
+  #
+  # What this records (2026-09-03): that an alert fired and later cleared,
+  # and how long that took. Both come from your alerting system and are real.
+  # What it does NOT record is whether a human fixed it — nothing can observe
+  # that, so nothing infers it. If you want that distinction captured, report
+  # it: POST /outcomes/{fingerprint_hash}/intervened with a short note.
+  #
+  # Until 1.0.6 this setting also let SentinelReady promote a pattern to
+  # `suppress` on its own, based on how often alerts appeared to resolve
+  # themselves — a figure it could not actually measure. That behaviour is
+  # disabled. Learning still runs on what is real: how long things take, how
+  # often they fire, and any interventions you report.
   outcome_learning: true
   pattern_sequences: true
 
