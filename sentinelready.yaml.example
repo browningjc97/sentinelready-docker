@@ -77,6 +77,21 @@ ai:
   # include_raw_payload: true
 
 # ── CUSTOMER ──────────────────────────────────────────────────
+# ── API reference ─────────────────────────────────────────────────────────
+# SentinelReady ships a full interactive API reference, generated from the
+# code itself so it can never drift: /docs (interactive), /redoc (reference)
+# and /openapi.json (machine-readable, for generating a client).
+#
+# Off by default. It requires no credentials, so anyone who can reach port
+# 8000 would get a complete map of every route and its parameters. That leaks
+# no data and opens no endpoint -- they all still require your webhook secret
+# -- but it is a convenience for an attacker, and this port is one the README
+# tells you to point alerting tools at, including hosted ones.
+#
+# On an internal-only deployment there is little reason not to enable it.
+api:
+  docs_enabled: false
+
 customer:
   # Your team or company name — used to tag all alerts and patterns
   default_code: myteam

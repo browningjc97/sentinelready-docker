@@ -816,6 +816,34 @@ correlation-combo answers too, which it always should have.
 
 ---
 
+## API Reference
+
+SentinelReady generates its own API reference from the running code, so it
+never drifts from what the build actually does:
+
+| path | what it is |
+|---|---|
+| `/docs` | interactive — try any endpoint from the browser |
+| `/redoc` | reference-style, easier to read end to end |
+| `/openapi.json` | machine-readable spec, for generating a client |
+
+**Off by default.** These need no credentials, so anyone who can reach port
+8000 would get a complete map of every route and its parameters. That exposes
+no data and opens no endpoint — they all still require your webhook secret —
+but it is a convenience for an attacker, and this is a port you may well have
+opened so a hosted alerting service can reach it.
+
+To turn it on, in `sentinelready.yaml`:
+
+```yaml
+api:
+  docs_enabled: true
+```
+
+Then restart. On an internal-only deployment there is little reason not to.
+
+---
+
 ## Grafana Dashboards
 
 If you're already running Prometheus + Grafana (the included
