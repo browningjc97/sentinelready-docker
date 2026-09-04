@@ -5,6 +5,48 @@ Upgrade with `docker compose pull && docker compose up -d`.
 
 ---
 
+## 1.0.7 — 2026-09-04
+
+**Recommended for everyone, and important if you run a local model on CPU.**
+
+- **SentinelReady no longer re-analyses alerts it already recognises.** A
+  pattern it had seen over a thousand times, holding a perfectly good stored
+  verdict, was still being sent to the AI on every single occurrence — because
+  the check asked "am I confident in this verdict?" when it should have been
+  asking "do I recognise this alert?". A pattern past 25 occurrences now
+  answers from memory unless something about it has changed.
+
+  On a local CPU model this was doing real damage. Analysis takes minutes, and
+  alerts were arriving faster than they could be processed, so the model
+  saturated and calls began timing out — at which point alerts were delivered
+  with no triage at all. Nothing was lost (SentinelReady always delivers), but
+  the triage you were paying for wasn't happening. In our own environment this
+  change cut AI calls by roughly two thirds and took untriaged alerts from 50%
+  to under 8%.
+
+  **Change still gets a fresh look.** If a pattern starts firing far more than
+  usual, the stored verdict is not reused — that is exactly when re-analysis is
+  worth the cost.
+
+- **Reused verdicts say so.** When an answer comes from memory rather than
+  fresh analysis, the alert carries a line telling you: how many times the
+  pattern has fired, the confidence, and that the AI was not consulted. You
+  should always be able to tell what you are looking at.
+
+- **Background work can no longer starve live alerts.** Generating the sitrep's
+  recommendations shares the same AI as real-time triage, and on a single local
+  model everything queues. That work is now time-limited and falls back to
+  simpler recommendations rather than holding up alerts behind it.
+
+- **"AI calls avoided" is now "Answered from memory", and the number was
+  wrong.** It counted only one of the two ways SentinelReady reuses an answer,
+  so it under-reported what you were actually saving — by about 10x in our
+  measurements. If the figure jumps after upgrading, nothing changed in
+  behaviour; it is now counting correctly.
+
+- **Fixed:** a burst-detection rule that had never worked, because it read a
+  field that alerts do not carry.
+
 ## 1.0.6 — 2026-09-03
 
 **Recommended for everyone. Improves what SentinelReady tells you, and stops
